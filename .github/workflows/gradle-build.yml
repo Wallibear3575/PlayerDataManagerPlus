@@ -1,0 +1,49 @@
+name: Gradle Build (PerWorldPlayerDataManager)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Ensure Gradle installed (if runner lacks wrapper)
+        run: |
+          if ! command -v gradle &> /dev/null; then
+            sudo apt-get update -y
+            sudo apt-get install -y gradle
+          fi
+          echo "Gradle version: $(gradle -v || true)"
+
+      - name: Create Gradle wrapper if missing
+        run: |
+          if [ ! -f "./gradlew" ]; then
+            gradle wrapper --gradle-version 8.4 || true
+          fi
+          chmod +x ./gradlew || true
+          ./gradlew --version
+
+      - name: Build plugin jar
+        run: |
+          ./gradlew clean build -x test --no-daemon
+
+      - name: Collect artifact (jar)
+        run: ls -la build/libs || true
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PerWorldPlayerDataManager-jar
+          path: build/libs/*.jar
