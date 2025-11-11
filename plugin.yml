@@ -1,0 +1,6 @@
+name: PerWorldPlayerDataManager
+version: 1.0.0
+main: com.kavydev.perworlddata.PlayerDataManager
+api-version: 1.21
+author: KavyDev
+description: Advanced per-world playerdata manager for PaperMC 1.21.10
