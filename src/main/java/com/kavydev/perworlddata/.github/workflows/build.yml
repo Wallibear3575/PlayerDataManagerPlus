@@ -1,0 +1,28 @@
+name: Build Plugin
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - name: Build jar
+        run: |
+          mkdir -p target
+          cd src/main/java
+          javac -d ../../../target *.java $(find . -name "*.java")
+          cd ../../../
+          jar cvf PerWorldPlayerDataManager.jar -C target/ .
+      - name: Upload jar
+        uses: actions/upload-artifact@v3
+        with:
+          name: PerWorldPlayerDataManager
+          path: PerWorldPlayerDataManager.jar
